@@ -442,3 +442,51 @@ module.exports.forgotPasswordOtp = async (req, res) => {
     });
   }
 };
+//// [POST] /api/v1/users/forrgot-password/otp
+module.exports.resetPassword = async (req, res) => {
+  try {
+    const {password, repassword} = req.body;
+    const token = req.cookies.token;
+
+    if(password != repassword){
+        return res.status(400).json({
+            message: `Mật khẩu không trùng khớp`
+        });
+    }
+
+    const user = await Users.findOne({
+        deleted: false,
+        tokenUser: token
+    })
+
+    if(!user){
+        return res.status(400).json({
+            message: `Token không hợp lệ`
+        });
+    }
+    if(md5(password) == user.password){
+        return res.status(400).json({
+            message: `Không dùng mật khẩu gần đây`
+        });
+    }
+
+    await Users.updateOne(
+        {
+            tokenUser: token
+        },
+        {
+            password: md5(password)
+        }
+    )
+
+
+    return res.status(200).json({
+      message: "Đổi mật khẩu thành công"
+    });
+
+  } catch (error) {
+    return res.status(400).json({
+      message: `Lỗi: ${error}`
+    });
+  }
+};

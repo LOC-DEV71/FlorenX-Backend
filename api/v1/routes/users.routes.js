@@ -13,7 +13,7 @@ router.get("/my-account", controller.accountUser)
 router.post("/update", controller.update)
 router.post("/forgot-password", controller.forgotPassword)
 router.post("/forgot-password/otp", controller.forgotPasswordOtp)
-router.post("/reset-password", controller.forgotPasswordOtp)
+router.post("/reset-password", controller.resetPassword)
 
 
 module.exports = router;
