@@ -12,13 +12,19 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "cloudinary": "^2.8.0",
+    "cookie": "^1.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "md5": "^2.3.0",
     "mongoose": "^9.1.2",
-    "nodemailer": "^7.0.12"
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.12",
+    "slugify": "^1.6.6",
+    "socket.io": "^4.8.3",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

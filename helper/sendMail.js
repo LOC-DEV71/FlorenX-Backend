@@ -4,8 +4,8 @@ module.exports.sendMail = (email, subject, html) =>{
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: '1945musictrending@gmail.com',         // email gửi
-            pass: 'pxme hqyl ngra bhij'    // App password (không phải mật khẩu gmail)
+            user: '1945musictrending@gmail.com',         
+            pass: 'pxme hqyl ngra bhij'    
         }
     });
 

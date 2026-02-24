@@ -1,19 +1,17 @@
-module.exports = (objectPagination, query, countProducts) =>{
-    if(objectPagination.currentPage < 1){
-        objectPagination.currentPage = 1;
+module.exports = (objectPagination, query, countProducts) => {
+    if(query.page < 1){
+        query.page = 1
     }
+    const limit = Number(query.limit) || 6;
+    const currentPage = Number(query.page) || 1;
 
-    const totalProducts = Math.ceil(countProducts/objectPagination.limitItem);
-    objectPagination.totalPage = totalProducts;
-    
-    if(query.page){
-        objectPagination.currentPage = Number(query.page);
-    }
-    if(query.limit){
-        objectPagination.limitItem = Number(query.limit);
-    }
+    objectPagination.limit = limit;
+    objectPagination.currentPage = currentPage;
+    objectPagination.skip = (currentPage - 1) * limit;
 
-    objectPagination.skip = (objectPagination.currentPage - 1)*objectPagination.limitItem;
+    if (countProducts) {
+        objectPagination.totalPage = Math.ceil(countProducts / limit);
+    }
 
     return objectPagination;
-}
+};
