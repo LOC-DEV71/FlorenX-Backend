@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 const articlesShema = new mongoose.Schema({
   title: String,
   description: String,
+  slug: String,
   content: String,
+  featured: String,
   thumbnail: String
 }, { timestamps: true });
 

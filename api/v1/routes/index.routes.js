@@ -17,6 +17,7 @@ const productsClientController = require("./client/products.routes");
 const vouchersClientController = require("./client/voucher.routes");
 const ordersClientController = require("./client/order.routes");
 const searchClientController = require("./client/search.routes");
+const articleClientController = require("./client/articles.routes");
 
 module.exports = (app) => {
     app.use("/api/v1/products", productsController)
@@ -38,5 +39,6 @@ module.exports = (app) => {
     app.use("/api/v1/client/vouchers", vouchersClientController)
     app.use("/api/v1/client/order", ordersClientController)
     app.use("/api/v1/client/search", searchClientController)
+    app.use("/api/v1/client/articles", articleClientController)
     app.use("/api/v1/carts", cartsController)
 }

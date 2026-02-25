@@ -13,6 +13,10 @@ const upload = multer({
 const uploadCloud = require("../Middleware/uploadCloud.middleware");
 
 
+router.get(
+    "/detail", 
+    controller.getDetail
+)
 router.post(
     "/create", 
     upload.fields([
@@ -20,6 +24,14 @@ router.post(
     ]),
     uploadCloud.streamUpload,
     controller.create
+)
+router.post(
+    "/update", 
+    upload.fields([
+        { name: "thumbnail", maxCount: 1 }
+    ]),
+    uploadCloud.streamUpload,
+    controller.update
 )
 
 module.exports = router;
