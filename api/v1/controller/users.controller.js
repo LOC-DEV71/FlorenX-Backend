@@ -42,8 +42,12 @@ module.exports.verifyRegisterOtp = async (req, res) => {
     await Otp.deleteMany({ email, type: "register" });
 
     res.cookie("token_client", newUser.tokenUser, {
+      // httpOnly: true,
+      // sameSite: "lax",
+      // maxAge: 7 * 24 * 60 * 60 * 1000
       httpOnly: true,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -121,9 +125,14 @@ module.exports.login = async (req, res) => {
         }
 
         res.cookie("token_client", user.tokenUser, {
+            // httpOnly: true,
+            // secure: false,      // true nếu https
+            // sameSite: "lax",    // QUAN TRỌNG
+            // maxAge: 7 * 24 * 60 * 60 * 1000
+
             httpOnly: true,
-            secure: false,      // true nếu https
-            sameSite: "lax",    // QUAN TRỌNG
+            secure: true,
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
@@ -160,7 +169,10 @@ module.exports.accountUser = async (req, res) =>{
 // [POST] /api/v1/users/logout
 module.exports.logout = async (req, res) =>{
     try {
-        res.clearCookie("token_client")
+        res.clearCookie("token_client", {
+          sameSite: "none",
+          secure: true
+        })
         res.clearCookie("cartId")
         return res.status(200).json({
             message: "OK"
@@ -271,9 +283,13 @@ module.exports.forgotPasswordOtp = async (req, res) => {
     }
 
     res.cookie("token_client", user.tokenUser, {
+      // httpOnly: true,
+      // sameSite: "lax",
+      // maxAge: 15 * 60 * 1000
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 15 * 60 * 1000
+      secure: true,
+      sameSite: "none",
+      maxAge: 2 * 24 * 60 * 60 * 1000
     });
 
     await Otp.deleteMany({ email });
