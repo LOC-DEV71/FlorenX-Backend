@@ -24,8 +24,13 @@ module.exports.login = async (req, res) => {
             })
         } 
         res.cookie("token", checkEmail.token, {
+            // locals
+            // httpOnly: true,
+            // sameSite: "lax",
+            // maxAge: 2 * 24 * 60 * 60 * 1000
             httpOnly: true,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
             maxAge: 2 * 24 * 60 * 60 * 1000
         });
 
@@ -81,7 +86,10 @@ module.exports.getme = async (req, res) => {
 
 module.exports.logout = async (req, res) =>{
     try {
-        res.clearCookie("token")
+        res.clearCookie("token", {
+            // sameSite: "none",
+            // secure: true
+        })
         return res.status(200).json({
             message: "OK"
         })
