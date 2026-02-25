@@ -87,8 +87,8 @@ module.exports.getme = async (req, res) => {
 module.exports.logout = async (req, res) =>{
     try {
         res.clearCookie("token", {
-            // sameSite: "none",
-            // secure: true
+            sameSite: "none",
+            secure: true
         })
         return res.status(200).json({
             message: "OK"
