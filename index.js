@@ -47,7 +47,6 @@ const io = new Server(server, {
       process.env.CONNECT_FE,
       "http://localhost:5173"
     ],
-    methods: ["GET", "POST"],
     credentials: true
   }
 });
