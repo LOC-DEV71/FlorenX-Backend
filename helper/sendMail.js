@@ -1,32 +1,33 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
-module.exports.sendMail = (email, subject, html) =>{
+module.exports.sendMail = async (email, subject, html) => {
+  try {
     const transporter = nodemailer.createTransport({
-        // service: 'gmail',
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false, // BẮT BUỘC false
-        auth: {    
-            user: process.env.MAIL_USER,
-            pass: process.env.MAIL_PASS
-        }
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false, 
+      },
     });
 
-    const mailOptions = {
-        from: process.env.MAIL_USER,
-        to: email,
-        subject: subject,
-        html: html
-    };
-    console.log("MAIL_USER:", process.env.MAIL_USER);
-    console.log("MAIL_PASS:", process.env.MAIL_PASS ? "OK" : "MISSING");    
+    // verify kết nối SMTP
+    await transporter.verify();
+    console.log("SMTP READY");
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log("Error:", error);
-        } else {
-            console.log('Email sent:', info.response);
-        }
+    const info = await transporter.sendMail({
+      from: `"FlorenX" <${process.env.MAIL_USER}>`,
+      to: email,
+      subject,
+      html,
     });
 
-}
+    console.log("Email sent:", info.response);
+  } catch (err) {
+    console.error("SEND MAIL ERROR:", err);
+  }
+};
