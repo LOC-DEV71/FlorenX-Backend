@@ -35,8 +35,6 @@ app.use(cors({
 
 
 
-
-
 routes(app);
 
 const server = http.createServer(app);
