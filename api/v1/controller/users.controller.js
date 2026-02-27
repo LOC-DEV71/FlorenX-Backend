@@ -232,7 +232,7 @@ module.exports.forgotPassword = async (req, res) =>{
         
 
         // gửi về mail ở service
-        await mailService.mailService(email, otp)
+        mailService.mailService(email, otp)
 
 
         return res.status(200).json({
