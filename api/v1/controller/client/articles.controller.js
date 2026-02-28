@@ -2,9 +2,9 @@ const Articles = require("../../models/articles.models");
 module.exports.getList = async (req, res) => {
     try {
         const category = req.query.category;
-        console.log(category)
         const articles = await Articles.find({
             featured: "yes",
+            status: "active",
             articleCategory: category
         }).limit(4)
         return res.status(200).json({

@@ -2,7 +2,7 @@ module.exports = (objectPagination, query, countProducts) => {
     if(query.page < 1){
         query.page = 1
     }
-    const limit = Number(query.limit) || 6;
+    const limit = Number(query.limit) || 5;
     const currentPage = Number(query.page) || 1;
 
     objectPagination.limit = limit;

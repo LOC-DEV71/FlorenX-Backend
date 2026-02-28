@@ -17,6 +17,10 @@ router.get(
     "/detail", 
     controller.getDetail
 )
+router.get(
+    "/get-list", 
+    controller.getList
+)
 router.post(
     "/create", 
     upload.fields([
@@ -24,6 +28,10 @@ router.post(
     ]),
     uploadCloud.streamUpload,
     controller.create
+)
+router.post(
+    "/change-multi", 
+    controller.changeMulti
 )
 router.post(
     "/update", 

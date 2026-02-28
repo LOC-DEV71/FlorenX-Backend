@@ -1,5 +1,6 @@
 const Articles = require("../models/articles.models");
 const slugHelper = require("../../../helper/slugHelper");
+const paginationHelper = require("../../../helper/pagination");
 module.exports.create = async (req, res) => {
     try {
         if(req.body.title){
@@ -63,6 +64,98 @@ module.exports.update = async (req, res) => {
         return res.status(200).json({
             message: "Cập nhật thành công",
         })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Lỗi ${error}`
+        })
+    }
+}
+
+module.exports.getList = async (req, res) => {
+    try {
+        const find = {}
+        const sort = {}
+        console.log(req.query.sort)
+        if(req.query.sort){
+            const [key, value] = req.query.sort.split("-");
+            sort[key] = value === "asc" ? 1 : -1;
+        }
+
+        if(req.query.sort === "featured-yes"){
+            const [featured, value] = req.query.sort.split("-");
+            find.featured = value
+        }
+
+        if(req.query.sort === "featured-no"){
+            const [featured, value] = req.query.sort.split("-");
+            find.featured = value
+        }
+
+        if(req.query.sort === "articleCategory-vouchers"){
+            const [articleCategory, value] = req.query.sort.split("-");
+            find.articleCategory = value
+        }
+        if(req.query.sort === "articleCategory-news"){
+            const [articleCategory, value] = req.query.sort.split("-");
+            find.articleCategory = value
+        }
+
+        const countArticle = await Articles.countDocuments();
+        const objectPagination = paginationHelper({}, req.query, countArticle);
+
+        const articles = await Articles
+            .find(find)
+            .limit(objectPagination.limit)
+            .skip(objectPagination.skip)
+            .sort(sort)
+        return res.status(200).json({
+            message: "OK",
+            articles,
+            pagination: objectPagination
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Lỗi ${error}`
+        })
+    }
+}
+
+module.exports.changeMulti = async (req, res) => {
+    try {
+        const key = req.body.typeChange;
+        const ids = req.body.selectIds;
+
+        if(!key){
+            return res.status(400).json({
+                message: "Vui lòng chọn hàng động cần thay đổi"
+            });
+        }
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                message: "Vui lòng chọn bài viết cần thay đổi"
+            });
+        }
+         switch (key) {
+            case "active":
+                await Articles.updateMany(
+                     { _id: { $in: ids } },
+                    { status: key }
+                )
+                return res.status(200).json({
+                    message: "Chuyển bài viết sang hoạt động"
+                });
+            case "inactive":
+                await Articles.updateMany(
+                     { _id: { $in: ids } },
+                    { status: key }
+                )
+                return res.status(200).json({
+                    message: "Chuyển bài viết sang không hoạt động"
+                });
+        
+            default:
+                return;
+        }
     } catch (error) {
         return res.status(400).json({
             message: `Lỗi ${error}`

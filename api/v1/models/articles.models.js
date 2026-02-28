@@ -7,6 +7,7 @@ const articlesShema = new mongoose.Schema({
   featured: String,
   thumbnail: String,
   articleCategory: String,
+  status: String
 }, { timestamps: true });
 
 const Article = mongoose.model("Articles", articlesShema, "articles");
