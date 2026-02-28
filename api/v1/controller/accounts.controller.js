@@ -95,3 +95,16 @@ module.exports.changeMultiAccounts = async (req, res) => {
     })
   }
 }
+
+module.exports.delete = async (req, res) => {
+  try {
+    await Accounts.deleteOne({_id: req.query.id})
+    return res.status(200).json({
+      message: "Đã xóa tài khoản thành công"
+    })
+  } catch (error) {
+    return res.status(400).json({
+      message: `Lỗi: ${error}`
+    })
+  }
+}

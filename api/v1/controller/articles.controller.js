@@ -162,3 +162,16 @@ module.exports.changeMulti = async (req, res) => {
         })
     }
 }
+
+module.exports.deleteArticle = async (req, res) => {
+    try {
+        await Articles.deleteOne({_id: req.query.id})
+        return res.status(200).json({
+            message: "Đã xóa thành công bài viết"
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Lỗi: ${error}`
+        })
+    }
+}

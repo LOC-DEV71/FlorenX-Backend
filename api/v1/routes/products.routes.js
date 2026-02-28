@@ -53,5 +53,11 @@ router.post(
   controller.create
 );
 
+router.delete(
+  "/delete",
+  productsMiddleware.productsMiddleware("delete-products"),
+  controller.delete
+)
+
 
 module.exports = router;

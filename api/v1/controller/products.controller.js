@@ -274,3 +274,18 @@ module.exports.update = async (req, res) => {
     });
   }
 };
+
+
+//DELETE /admin/products/delete
+module.exports.delete = async (req, res) => {
+  try {
+    await Products.deleteOne({_id: req.query.id})
+    return res.status(200).json({
+      message: "Đã xóa sản phẩm thành công"
+    })
+  } catch (error) {
+    return res.status(400).json({
+      message: `Lỗi: ${error}`
+    })
+  }
+}

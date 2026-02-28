@@ -8,5 +8,6 @@ router.get("/get", vouchersMiddleware.vouchersMiddleware("view-vouchers"), contr
 router.get("/detail/:id", vouchersMiddleware.vouchersMiddleware("view-vouchers"), controller.getOneVoucher)
 router.patch("/update/:id", vouchersMiddleware.vouchersMiddleware("update-vouchers"), controller.updateVoucher)
 router.patch("/change-multi", vouchersMiddleware.vouchersMiddleware("update-vouchers"), controller.changeMultiVouchers)
+router.delete("/delete", vouchersMiddleware.vouchersMiddleware("delete-vouchers"), controller.deleteVoucher)
 
 module.exports = router;

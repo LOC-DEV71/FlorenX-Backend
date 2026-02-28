@@ -121,3 +121,16 @@ module.exports.changeMultiVouchers = async (req, res) => {
         })
     }
 }
+
+module.exports.deleteVoucher = async (req, res) => {
+    try {
+        await Vouchers.deleteOne({_id: req.query.id})
+        return res.status(200).json({
+            message: "Đã xóa thành công voucher"
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Lỗi: ${error}`
+        })
+    }
+}
