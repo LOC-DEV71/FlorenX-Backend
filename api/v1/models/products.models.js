@@ -22,8 +22,10 @@ const productSchema = new mongoose.Schema({
   },
   evaluate: [
     {
-        user_id: String,
-        comment: String
+      user_id: String,
+      user_name: String,
+      comment: String,
+      rating: Number
     }
   ],
   createdBy: {

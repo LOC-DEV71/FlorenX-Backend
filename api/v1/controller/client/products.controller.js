@@ -1,5 +1,7 @@
 const Products = require("../../models/products.models");
 const Category = require("../../models/product.category.models");
+const Order = require("../../models/order.models");
+const User = require("../../models/users.models");
 const getAllCategoryId = require("../../../../helper/getCategoryIds");
 
 module.exports.index = async (req, res) => {
@@ -125,3 +127,56 @@ module.exports.detail = async (req, res) => {
     })
   }
 }
+
+module.exports.evaluate = async (req, res) => {
+  try {
+    const product_id = req.query.product_id;
+    const token_user = req.cookies.token_client;
+    const {rating, comment} = req.body;
+
+    const user = await User.findOne({
+      tokenUser: token_user
+    }).lean().select("_id fullname")
+    
+    if(!user){
+      return res.status(401).json({
+        message: "Không tìm thấy người dùng"
+      });
+    }
+
+    const order = await Order.findOne({
+      token_user: token_user,
+      status: "done",
+      "items.product_id": product_id
+    })
+
+    if(!order){
+      return res.status(401).json({
+        message: "Bạn chưa đủ quyền để đánh giá sản phẩm này"
+      });
+    }
+    await Products.updateOne(
+      { _id: product_id },
+      {
+        $push: {
+          evaluate: {
+            user_id: user._id,
+            user_name: user.fullname,
+            rating,
+            comment,
+            createdAt: new Date()
+          }
+        }
+      }
+    );
+
+    return res.status(200).json({
+      message: "Đánh giá thành công"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: `Lỗi: ${error.message}`
+    });
+  }
+};

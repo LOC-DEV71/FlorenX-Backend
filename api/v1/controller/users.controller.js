@@ -150,8 +150,13 @@ module.exports.login = async (req, res) => {
 
 // [GET] /api/v1/users/me
 module.exports.me = async (req, res) => {
+  const token_client = req.cookies.token_client || "";
+  const client = await Users.findOne({
+    tokenUser: token_client
+  }).lean().select("_id")
     return res.status(200).json({
-        message: "OK"
+        message: "OK",
+        user: client
     })
 }
 
