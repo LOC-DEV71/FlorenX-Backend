@@ -179,6 +179,14 @@ module.exports.delete = async (req, res) => {
         message: "Danh mục còn sản phẩm"
       })
     }
+    const category = await ProductCategorys.find({_id: id})
+    if(!category.parent_id){
+      return res.status(400).json({
+        message: "Danh mục còn danh mục con"
+      })
+    }
+
+    console.log(category)
     await ProductCategorys.deleteOne({_id: id})
     return res.status(200).json({
       message: "Đã xóa danh mục"
