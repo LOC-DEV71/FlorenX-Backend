@@ -1,5 +1,6 @@
 const ProductCategorys = require("../models/product.category.models");
 const Accounts = require("../models/accounts.models");
+const Products = require("../models/products.models");
 const AdminActivity = require("../models/adminActivitySchema");
 
 const slugHelper = require("../../../helper/slugHelper");
@@ -166,3 +167,25 @@ module.exports.changeMulti = async (req, res) => {
     });
   }
 };
+
+module.exports.delete = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const product = await Products.find({
+      product_category_id: id
+    });
+    if(product.length > 0){
+      return res.status(400).json({
+        message: "Danh mục còn sản phẩm"
+      })
+    }
+    await ProductCategorys.deleteOne({_id: id})
+    return res.status(200).json({
+      message: "Đã xóa danh mục"
+    })
+  } catch (error) {
+    return res.status(400).json({
+      message: `Lỗi: ${error}`
+    })
+  }
+}

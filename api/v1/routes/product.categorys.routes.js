@@ -22,6 +22,11 @@ router.patch(
     categoryMiddleware.productCategorysMiddleware("update-categories"),
     controller.changeMulti
 );
+router.delete(
+    "/delete", 
+    categoryMiddleware.productCategorysMiddleware("delete-categories"),
+    controller.delete
+);
 
 
 module.exports = router;
