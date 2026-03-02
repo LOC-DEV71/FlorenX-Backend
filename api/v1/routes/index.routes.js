@@ -11,6 +11,7 @@ const chatsController = require("./chats.routes");
 const vouchersController = require("./voucher.routes");
 const orderController = require("./order.routes");
 const articlesController = require("./articles.routes");
+const dashboardController = require("./dashboard.routes");
 
 const categoryClientController = require("./client/category.routes");
 const productsClientController = require("./client/products.routes");
@@ -31,6 +32,7 @@ module.exports = (app) => {
     app.use("/api/v1/vouchers", vouchersController)
     app.use("/api/v1/orders", orderController)
     app.use("/api/v1/articles", articlesController)
+    app.use("/api/v1/dashboard", dashboardController)
 
     //client
     app.use("/api/v1/users", usersController)
