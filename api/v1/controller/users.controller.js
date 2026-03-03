@@ -32,22 +32,28 @@ module.exports.googleLogin = async (req, res) => {
     let user = await Users.findOne({ email });
 
     if (!user) {
-      user = await Users.create({
+      user = new Users({
         email,
         fullName: name,
         avatar: picture,
         password: null
       });
+
+      await user.save();
+
+      const roomChat = new Roomchats({
+        user_id: user._id
+      });
+
+      await roomChat.save();
     }
 
-    console.log("USER OK");
 
     const tokenSystem = jwtHelper.createToken(
       { id: user._id, type: "login" },
       "7d"
     );
 
-    console.log("TOKEN CREATED:", tokenSystem);
 
     res.cookie("token_client", tokenSystem, {
       httpOnly: true,
@@ -55,8 +61,6 @@ module.exports.googleLogin = async (req, res) => {
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
-
-    console.log("COOKIE SET");
 
     return res.json({ ok: true });
 

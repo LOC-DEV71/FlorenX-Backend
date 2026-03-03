@@ -1,4 +1,5 @@
 const cookie = require("cookie");
+const jwt = require("jsonwebtoken");
 const Account = require("../models/accounts.models");
 const User = require("../models/users.models");
 
@@ -14,10 +15,9 @@ module.exports = (io) => {
 
     const parsed = cookie.parse(cookies);
 
-    const adminToken = parsed.token;
-    const userToken  = parsed.token_client;
+    const adminToken = parsed.token;           
+    const userToken  = parsed.token_client;   
 
-    // admin
     if (adminToken) {
       const admin = await Account.findOne({
         token: adminToken,
@@ -36,29 +36,33 @@ module.exports = (io) => {
       }
     }
 
-    // client
     if (userToken) {
-      const user = await User.findOne({
-        tokenUser: userToken,
-        deleted: false,
-        status: "active"
-      }).select("_id fullname");
+      try {
+        const decoded = jwt.verify(userToken, process.env.JWT_SECRET);
 
-      if (user) {
-        socket.join("clients");
-        socket.join(`user_${user._id}`);
+        const user = await User.findOne({
+          _id: decoded.id,
+          deleted: false,
+          status: "active"
+        }).select("_id fullname");
 
-        socket.role = "client";
-        socket.userId = user._id;
+        if (user) {
+          socket.join("clients");
+          socket.join(`user_${user._id}`);
 
-        console.log("Client connected:", user._id.toString());
+          socket.role = "client";
+          socket.userId = user._id;
+
+          console.log("Client connected:", user._id.toString());
+        }
+      } catch (err) {
+        console.log("JWT client error:", err.message);
       }
     }
 
     require("./admin.socket")(io, socket);
     require("./client.socket")(io, socket);
     require("./chat.socket")(io, socket);
-    
 
     socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);

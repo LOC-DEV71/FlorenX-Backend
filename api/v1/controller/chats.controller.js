@@ -2,60 +2,89 @@ const RoomChat = require("../models/roomChat.model");
 const User = require("../models/users.models")
 const Accounts = require("../models/accounts.models");
 const Message = require("../models/message.model")
+const jwt = require("jsonwebtoken");
 
 module.exports.sendMessage = async (req, res) => {
     try {
-        const {content, sender_role, room_chat_id} = req.body;
-        const token_client = req.cookies.token_client;
-        const token_admin = req.cookies.token;
-        const client = await User.findOne({
-            deleted: false,
-            tokenUser: token_client
-        })
-        const admin = await Accounts.findOne({
-            deleted: false,
-            token: token_admin
-        })
-        if(sender_role === "client"){
-            req.body.sender_id = client.id;
-        } else if(sender_role==="admin"){
-            req.body.sender_id = admin.id
+        const { content, sender_role, room_chat_id } = req.body;
+
+        let sender_id;
+
+        if (sender_role === "client") {
+
+            const token_client = req.cookies.token_client;
+            if (!token_client) {
+                return res.status(401).json({ message: "Chưa đăng nhập client" });
+            }
+
+            const decoded = jwt.verify(token_client, process.env.JWT_SECRET);
+            sender_id = decoded.id;
+
+        } else if (sender_role === "admin") {
+
+            const token_admin = req.cookies.token;
+            const admin = await Accounts.findOne({
+                deleted: false,
+                token: token_admin
+            });
+
+            if (!admin) {
+                return res.status(401).json({ message: "Admin không hợp lệ" });
+            }
+
+            sender_id = admin._id;
         }
-        const saveMessage = new Message(req.body)
-        saveMessage.save();
-        console.log(req.body)
+
+        const saveMessage = await Message.create({
+            content,
+            room_chat_id,
+            sender_role,
+            sender_id
+        });
+
         return res.status(200).json({
-            message: ""
-        })
+            message: "OK"
+        });
+
     } catch (error) {
         return res.status(400).json({
-            message: `Lỗi ${error}`
-        })
+            message: `Lỗi ${error.message}`
+        });
     }
-}
+};
 module.exports.getRoom = async (req, res) => {
     try {
-        const tokenUser = req.cookies.token_client;
-        const idUser = await User.findOne({
-            deleted: false,
-            tokenUser: tokenUser
-        })
 
-        const roomId = await RoomChat.findOne({
-            user_id: idUser._id.toString()
-        })
+        const token = req.cookies.token_client; 
 
+        if (!token) {
+            return res.status(401).json({
+                message: "Chưa đăng nhập"
+            });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const room = await RoomChat.findOne({
+            user_id: decoded.id
+        });
+
+        if (!room) {
+            return res.status(404).json({
+                message: "Chưa có phòng"
+            });
+        }
 
         return res.status(200).json({
-            room_chat_id: roomId.id
-        })
+            room_chat_id: room._id
+        });
+
     } catch (error) {
         return res.status(400).json({
-            message: `Lỗi: ${error}`
-        })
+            message: `Lỗi: ${error.message}`
+        });
     }
-}
-
+};
 module.exports.listRoom = async (req, res) => {
     try {
         const rooms = await RoomChat.find();
