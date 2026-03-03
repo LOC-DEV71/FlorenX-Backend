@@ -8,6 +8,8 @@ router.get(
     "/", 
     controller.index
 )
+router.post("/google", controller.googleLogin);
+
 router.post(
     "/register/otp" , 
     userValiable.registerValiable, 
