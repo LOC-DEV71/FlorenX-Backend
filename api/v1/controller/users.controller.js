@@ -51,7 +51,8 @@ module.exports.googleLogin = async (req, res) => {
 
     res.cookie("token_client", tokenSystem, {
       httpOnly: true,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
