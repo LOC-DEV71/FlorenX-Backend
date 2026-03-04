@@ -6,6 +6,10 @@ module.exports.create = async (req, res) => {
         if(req.body.title){
             req.body.slug = slugHelper(req.body.title);
         }
+        if(req.body.position){
+            req.body.position = Number(req.body.position)
+        }
+        
         const createArticle = new Articles(req.body);
         await createArticle.save();
 
@@ -55,6 +59,11 @@ module.exports.update = async (req, res) => {
         if(req.body.title){
             req.body.slug = slugHelper(req.body.title)
         }
+
+        if(req.body.position){
+            req.body.position = Number(req.body.position)
+        }
+        
 
         await Articles.updateOne(
             {slug: slug},
