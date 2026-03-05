@@ -5,32 +5,48 @@ const Cart = require("../../models/carts.model");
 const Users = require("../../models/users.models");
 const generalHelper = require("../../../../helper/generate");
 const mailOrder = require("../../service/returnEmai.service");
+const jwt = require("jsonwebtoken");
 
 module.exports.checkout = async (req, res) => {
   try {
     const { items, voucher_id } = req.body;
-    const token_user = req.cookies.token_client || null;
     const cartId = req.cookies.cartId;
+    const token = req.cookies.token_client;
+
+    let userId = null;
+
+    // decode JWT
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+    }
 
     let voucher = null;
 
     if (voucher_id && voucher_id !== "null") {
       voucher = await Vouchers.findById(voucher_id);
+
       if (!voucher) {
         return res.status(400).json({ message: "Voucher không tồn tại" });
       }
+
       if (voucher.quantity <= 0) {
         return res.status(400).json({ message: "Số lượng voucher đã hết" });
       }
     }
 
     const general = generalHelper.generateRandomString(8);
-    req.body.general = general.toUpperCase();
-    req.body.token_user = token_user;
 
-    const createOrder = await Orders(req.body);
+    const orderData = {
+      ...req.body,
+      general: general.toUpperCase(),
+      user_id: userId
+    };
+
+    const createOrder = new Orders(orderData);
     await createOrder.save();
 
+    // trừ kho
     for (const item of items) {
       await Products.updateOne(
         { _id: item.product_id },
@@ -38,6 +54,7 @@ module.exports.checkout = async (req, res) => {
       );
     }
 
+    // trừ voucher
     if (voucher) {
       await Vouchers.updateOne(
         { _id: voucher._id },
@@ -45,21 +62,27 @@ module.exports.checkout = async (req, res) => {
       );
     }
 
+    // xóa giỏ hàng
     await Cart.updateOne(
       { _id: cartId },
       { $set: { products: [] } }
     );
 
+    // lấy email user
+    if (userId) {
+      const user = await Users.findById(userId)
+        .select("email")
+        .lean();
 
-    const user = await Users.findOne(
-      {
-        tokenUser: token_user
+      if (user) {
+        mailOrder.mailOrder(user.email, createOrder.general, items);
       }
-    ).select("email").lean();
-    mailOrder.mailOrder(user.email, createOrder.general, req.body.items)
+    }
 
+    return res.status(200).json({
+      message: "Đặt hàng thành công"
+    });
 
-    return res.status(200).json({ message: "Đặt hàng thành công" });
   } catch (error) {
     return res.status(400).json({
       message: `Lỗi: ${error.message}`
@@ -69,9 +92,16 @@ module.exports.checkout = async (req, res) => {
 
 module.exports.myOrders = async (req, res) => {
   try {
-    const token_user = req.cookies.token_client || "";
+    const token = req.cookies.token_client;
+
+    let userId = null;
+    // decode JWT
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id
+    }
     const orders = await Orders.find({
-      token_user: token_user
+      user_id: userId
     })
     return res.status(200).json({
       message: "OK",

@@ -66,6 +66,7 @@ module.exports.mailService = async (email, otp) => {
 
 
 module.exports.mailOrder = async (email, orderCode, items = []) => {
+  console.log(email, orderCode, items)
   const subject = `Xác nhận đơn hàng ${orderCode} - FlorenX`;
 
   const productHtml = items.map(item => {

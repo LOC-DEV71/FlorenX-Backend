@@ -6,7 +6,7 @@ const OrderSchema = new mongoose.Schema(
     phone: String,
     address: String,
     general: String,
-    token_user: String,
+    user_id: String,
 
     items: [
       {
@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema(
 
     payment_method: {
       type: String,
-      enum: ["cod", "vnpay"],
+      enum: ["cod", "paypal"],
       default: "cod"
     },
 
